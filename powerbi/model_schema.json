@@ -1,0 +1,134 @@
+{
+  "model_name": "CustomerVoice_AI_Analytics_Model",
+  "version": "1.0.0",
+  "source_database": {
+    "engine": "PostgreSQL",
+    "dialect": "postgresql+psycopg2",
+    "local_connection": "localhost:5434/customervoice_db",
+    "production_cloud": "Supabase PostgreSQL (port 6543 pooler / port 5432 direct)"
+  },
+  "tables": [
+    {
+      "name": "FactReviews",
+      "source_table": "public.reviews",
+      "type": "Fact",
+      "primary_key": "review_id",
+      "columns": [
+        {"name": "review_id", "data_type": "string", "nullable": false},
+        {"name": "review_text", "data_type": "string", "nullable": false},
+        {"name": "cleaned_text", "data_type": "string", "nullable": false},
+        {"name": "rating", "data_type": "double", "nullable": true, "semantic_note": "Preserved NULL per zero-fabrication mandate"},
+        {"name": "review_date", "data_type": "date", "nullable": true, "semantic_note": "Preserved NULL per zero-fabrication mandate"},
+        {"name": "product_id", "data_type": "string", "nullable": true, "foreign_key_to": "DimProducts.product_id"},
+        {"name": "campaign", "data_type": "string", "nullable": true},
+        {"name": "source", "data_type": "string", "nullable": false},
+        {"name": "pii_detected", "data_type": "boolean", "nullable": false},
+        {"name": "pii_types", "data_type": "string", "nullable": true},
+        {"name": "created_at", "data_type": "dateTime", "nullable": false}
+      ]
+    },
+    {
+      "name": "FactSentiment",
+      "source_table": "public.sentiment_results",
+      "type": "Fact",
+      "primary_key": "id",
+      "columns": [
+        {"name": "id", "data_type": "int64", "nullable": false},
+        {"name": "review_id", "data_type": "string", "nullable": false, "foreign_key_to": "FactReviews.review_id"},
+        {"name": "sentiment", "data_type": "string", "nullable": false},
+        {"name": "sentiment_score", "data_type": "double", "nullable": false},
+        {"name": "confidence", "data_type": "double", "nullable": false},
+        {"name": "model_name", "data_type": "string", "nullable": false},
+        {"name": "model_version", "data_type": "string", "nullable": false},
+        {"name": "created_at", "data_type": "dateTime", "nullable": false}
+      ]
+    },
+    {
+      "name": "BridgeTopics",
+      "source_table": "public.topics",
+      "type": "Bridge",
+      "primary_key": "id",
+      "columns": [
+        {"name": "id", "data_type": "int64", "nullable": false},
+        {"name": "review_id", "data_type": "string", "nullable": false, "foreign_key_to": "FactReviews.review_id"},
+        {"name": "topic", "data_type": "string", "nullable": false},
+        {"name": "topic_confidence", "data_type": "double", "nullable": false},
+        {"name": "is_primary", "data_type": "boolean", "nullable": false},
+        {"name": "created_at", "data_type": "dateTime", "nullable": false}
+      ]
+    },
+    {
+      "name": "DimProducts",
+      "source_table": "public.products",
+      "type": "Dimension",
+      "primary_key": "product_id",
+      "columns": [
+        {"name": "product_id", "data_type": "string", "nullable": false},
+        {"name": "product_name", "data_type": "string", "nullable": false},
+        {"name": "category", "data_type": "string", "nullable": false},
+        {"name": "created_at", "data_type": "dateTime", "nullable": false}
+      ]
+    },
+    {
+      "name": "FactAlerts",
+      "source_table": "public.alerts",
+      "type": "Fact",
+      "primary_key": "alert_id",
+      "columns": [
+        {"name": "alert_id", "data_type": "string", "nullable": false},
+        {"name": "alert_type", "data_type": "string", "nullable": false},
+        {"name": "severity", "data_type": "string", "nullable": false},
+        {"name": "product", "data_type": "string", "nullable": false},
+        {"name": "topic", "data_type": "string", "nullable": false},
+        {"name": "metric", "data_type": "string", "nullable": false},
+        {"name": "previous_value", "data_type": "double", "nullable": false},
+        {"name": "current_value", "data_type": "double", "nullable": false},
+        {"name": "percentage_change", "data_type": "double", "nullable": false},
+        {"name": "message", "data_type": "string", "nullable": false},
+        {"name": "created_at", "data_type": "dateTime", "nullable": false},
+        {"name": "status", "data_type": "string", "nullable": false}
+      ]
+    },
+    {
+      "name": "FactModelMetrics",
+      "source_table": "public.model_metrics",
+      "type": "Fact",
+      "primary_key": "id",
+      "columns": [
+        {"name": "id", "data_type": "int64", "nullable": false},
+        {"name": "evaluation_type", "data_type": "string", "nullable": false},
+        {"name": "category", "data_type": "string", "nullable": false},
+        {"name": "metric_name", "data_type": "string", "nullable": false},
+        {"name": "metric_value", "data_type": "double", "nullable": false},
+        {"name": "validation_sample_size", "data_type": "int64", "nullable": false},
+        {"name": "evaluation_timestamp", "data_type": "dateTime", "nullable": false}
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "from_table": "FactSentiment",
+      "from_column": "review_id",
+      "to_table": "FactReviews",
+      "to_column": "review_id",
+      "cardinality": "1:1",
+      "cross_filtering": "bothDirections"
+    },
+    {
+      "from_table": "BridgeTopics",
+      "from_column": "review_id",
+      "to_table": "FactReviews",
+      "to_column": "review_id",
+      "cardinality": "*:1",
+      "cross_filtering": "bothDirections"
+    },
+    {
+      "from_table": "FactReviews",
+      "from_column": "product_id",
+      "to_table": "DimProducts",
+      "to_column": "product_id",
+      "cardinality": "*:1",
+      "cross_filtering": "single"
+    }
+  ]
+}

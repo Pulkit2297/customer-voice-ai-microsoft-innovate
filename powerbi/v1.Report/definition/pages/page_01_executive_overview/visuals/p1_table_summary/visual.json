@@ -1,0 +1,116 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "p1_table_summary",
+  "position": {
+    "x": 40,
+    "y": 880,
+    "z": 11,
+    "height": 150,
+    "width": 1190,
+    "tabOrder": 11
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public reviews"
+                    }
+                  },
+                  "Property": "source"
+                }
+              },
+              "queryRef": "public reviews.source",
+              "nativeQueryRef": "Acquisition Channel"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public reviews"
+                    }
+                  },
+                  "Property": "Total Reviews"
+                }
+              },
+              "queryRef": "public reviews.Total Reviews",
+              "nativeQueryRef": "Total Reviews"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public reviews"
+                    }
+                  },
+                  "Property": "Positive Sentiment %"
+                }
+              },
+              "queryRef": "public reviews.Positive Sentiment %",
+              "nativeQueryRef": "Positive %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public reviews"
+                    }
+                  },
+                  "Property": "Negative Sentiment %"
+                }
+              },
+              "queryRef": "public reviews.Negative Sentiment %",
+              "nativeQueryRef": "Negative %"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public reviews"
+                    }
+                  },
+                  "Property": "Net Sentiment Score"
+                }
+              },
+              "queryRef": "public reviews.Net Sentiment Score",
+              "nativeQueryRef": "Net Sentiment"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Channel Executive Summary'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

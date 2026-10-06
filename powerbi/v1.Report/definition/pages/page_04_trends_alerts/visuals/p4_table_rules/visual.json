@@ -1,0 +1,102 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "p4_table_rules",
+  "position": {
+    "x": 40,
+    "y": 360,
+    "z": 6,
+    "height": 670,
+    "width": 750,
+    "tabOrder": 6
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public alerts"
+                    }
+                  },
+                  "Property": "alert_type"
+                }
+              },
+              "queryRef": "public alerts.alert_type",
+              "nativeQueryRef": "Monitored Signal"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public alerts"
+                    }
+                  },
+                  "Property": "severity"
+                }
+              },
+              "queryRef": "public alerts.severity",
+              "nativeQueryRef": "Severity Level"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public alerts"
+                    }
+                  },
+                  "Property": "metric"
+                }
+              },
+              "queryRef": "public alerts.metric",
+              "nativeQueryRef": "Target Metric"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public alerts"
+                    }
+                  },
+                  "Property": "status"
+                }
+              },
+              "queryRef": "public alerts.status",
+              "nativeQueryRef": "Engine State"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Alert Rule Configurations & Trigger Thresholds'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

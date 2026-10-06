@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/pagesMetadata/1.1.0/schema.json",
+  "pageOrder": [
+    "page_01_executive_overview",
+    "page_02_unhappy_customers",
+    "page_03_product_campaign",
+    "page_04_trends_alerts",
+    "page_05_model_health"
+  ],
+  "activePageName": "page_01_executive_overview"
+}

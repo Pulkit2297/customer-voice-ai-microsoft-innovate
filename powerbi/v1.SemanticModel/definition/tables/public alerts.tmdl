@@ -1,0 +1,122 @@
+table 'public alerts'
+	lineageTag: ee5d39ba-360d-4959-ae69-086ccecae322
+
+	column alert_id
+		dataType: string
+		lineageTag: 8fb49617-ffa1-4ce8-ad23-dca50ddfca31
+		summarizeBy: none
+		sourceColumn: alert_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column alert_type
+		dataType: string
+		lineageTag: 648c447a-f39c-4afa-9088-0b55312f9618
+		summarizeBy: none
+		sourceColumn: alert_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column severity
+		dataType: string
+		lineageTag: 115c034d-4b89-4021-8358-9eecc8640df4
+		summarizeBy: none
+		sourceColumn: severity
+
+		annotation SummarizationSetBy = Automatic
+
+	column product
+		dataType: string
+		lineageTag: cae78654-3965-4e29-b017-d10218a523e4
+		summarizeBy: none
+		sourceColumn: product
+
+		annotation SummarizationSetBy = Automatic
+
+	column topic
+		dataType: string
+		lineageTag: 139dd4f3-b6f6-4538-99e1-7c5dcb0c7a45
+		summarizeBy: none
+		sourceColumn: topic
+
+		annotation SummarizationSetBy = Automatic
+
+	column metric
+		dataType: string
+		lineageTag: 858a759a-ddc0-4224-a845-b2272e531e16
+		summarizeBy: none
+		sourceColumn: metric
+
+		annotation SummarizationSetBy = Automatic
+
+	column previous_value
+		dataType: double
+		lineageTag: e01210af-6631-4d0c-835c-12ce32b9c52b
+		summarizeBy: sum
+		sourceColumn: previous_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column current_value
+		dataType: double
+		lineageTag: e4203bc8-40c4-466e-9238-acce3d95171c
+		summarizeBy: sum
+		sourceColumn: current_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column percentage_change
+		dataType: double
+		lineageTag: feeb1d86-a17c-4376-8d47-ee56b01548b4
+		summarizeBy: sum
+		sourceColumn: percentage_change
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column message
+		dataType: string
+		lineageTag: 7042d7fa-eca4-45af-b73f-39136cb7be21
+		summarizeBy: none
+		sourceColumn: message
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 09922c2e-1dc5-4b10-8b57-c6290238f560
+		summarizeBy: none
+		sourceColumn: created_at
+
+		variation Variation
+			isDefault
+			relationship: 83e8dc5e-68e6-44e9-b6b3-00ace7f1dfda
+			defaultHierarchy: LocalDateTable_b4378a6d-3dad-4b5a-b747-755569a7ea38.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	column status
+		dataType: string
+		lineageTag: cb10243c-75df-474e-83dd-dcbad1f95d2e
+		summarizeBy: none
+		sourceColumn: status
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'public alerts' = m
+		mode: import
+		source =
+				let
+				  Source = PostgreSQL.Database("db.ehmgeoakcckhagdjjmmr.supabase.co", "postgres"),
+				  #"Navigation 1" = Source{[Schema = "public", Item = "alerts"]}[Data]
+				in
+				  #"Navigation 1"
+
+	annotation PBI_ResultType = Table
+

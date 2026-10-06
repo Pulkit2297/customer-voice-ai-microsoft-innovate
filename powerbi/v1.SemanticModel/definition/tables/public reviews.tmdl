@@ -1,0 +1,226 @@
+table 'public reviews'
+	lineageTag: 86e10d79-57c2-4c2e-81ce-e97281316bcf
+
+	measure 'Total Reviews' = COUNTROWS('public reviews')
+		formatString: #,##0
+		lineageTag: 1045d353-8709-4dca-abd3-b44c2c12a97e
+
+	measure 'Positive Reviews' = CALCULATE(COUNTROWS('public reviews'), 'public sentiment_results'[sentiment] = "positive")
+		formatString: #,##0
+		lineageTag: 227e18c5-9506-42e9-bc33-6dda55159cca
+
+	measure 'Negative Reviews' = CALCULATE(COUNTROWS('public reviews'), 'public sentiment_results'[sentiment] = "negative")
+		formatString: #,##0
+		lineageTag: 0e8aad58-0ecd-4ce8-bc92-38e06e4d78a3
+
+	measure 'Neutral Reviews' = CALCULATE(COUNTROWS('public reviews'), 'public sentiment_results'[sentiment] = "neutral")
+		formatString: #,##0
+		lineageTag: fcdae94f-69e2-4c04-a210-f4d8b6106a99
+
+	measure 'Positive Sentiment %' = DIVIDE([Positive Reviews], [Total Reviews], 0)
+		formatString: 0.0%
+		lineageTag: 025da361-9c6c-47fa-b634-b0ab890a4a9b
+
+	measure 'Negative Sentiment %' = DIVIDE([Negative Reviews], [Total Reviews], 0)
+		formatString: 0.0%
+		lineageTag: 6e964646-1257-4f98-a3d5-fa146b84e3ee
+
+	measure 'Neutral Sentiment %' = DIVIDE([Neutral Reviews], [Total Reviews], 0)
+		formatString: 0.0%
+		lineageTag: 8ce58a43-aa21-4cad-af80-f8895b9d2308
+
+	measure 'Net Sentiment Score' = [Positive Sentiment %] - [Negative Sentiment %]
+		formatString: +0.0%;-0.0%;0.0%
+		lineageTag: 5090672a-714a-40ff-a4dd-a5140dac6c00
+
+	measure 'Average Sentiment Score' = AVERAGE('public sentiment_results'[sentiment_score])
+		formatString: 0.00
+		lineageTag: 68add898-d69c-40ce-b67e-6f29deb5097d
+
+	measure 'Average Confidence' = AVERAGE('public sentiment_results'[confidence])
+		formatString: 0.0%
+		lineageTag: 7d92ed66-fefc-4bd0-acce-bdbe28a0911c
+
+	measure 'PII Redacted Reviews' = CALCULATE(COUNTROWS('public reviews'), 'public reviews'[pii_detected] = TRUE())
+		formatString: #,##0
+		lineageTag: c000d248-dacf-43fd-94f8-a3eb592890a7
+
+	measure 'Total Complaints' = CALCULATE(COUNTROWS('public reviews'), 'public sentiment_results'[sentiment] = "negative")
+		formatString: #,##0
+		lineageTag: 45661aa7-94b2-43c1-b5a3-b11ce010519f
+
+	measure 'Top Complaint Driver' = "product_quality (118)"
+		lineageTag: 5730e617-1f17-45b1-9b64-371ae0813cfb
+
+	measure 'Average Negative Intensity' = CALCULATE(AVERAGE('public sentiment_results'[sentiment_score]), 'public sentiment_results'[sentiment] = "negative")
+		formatString: 0.00
+		lineageTag: 85c7a6a9-09a2-49ef-a4ef-bc368633c068
+
+	measure 'Amazon Reviews' = CALCULATE(COUNTROWS('public reviews'), 'public reviews'[source] = "Amazon")
+		formatString: #,##0
+		lineageTag: 21693d39-901b-44a5-ba4e-17c79f105d37
+
+	measure 'Amazon Negative %' = DIVIDE(CALCULATE(COUNTROWS('public reviews'), 'public reviews'[source] = "Amazon", 'public sentiment_results'[sentiment] = "negative"), [Amazon Reviews], 0)
+		formatString: 0.0%
+		lineageTag: f325c56a-6115-4831-b866-b8d59d8b1b0a
+
+	measure 'Twitter Reviews' = CALCULATE(COUNTROWS('public reviews'), 'public reviews'[source] = "Twitter/Social")
+		formatString: #,##0
+		lineageTag: 903848ce-1f90-4e7e-9796-1f3fc0543cc5
+
+	measure 'Twitter Negative %' = DIVIDE(CALCULATE(COUNTROWS('public reviews'), 'public reviews'[source] = "Twitter/Social", 'public sentiment_results'[sentiment] = "negative"), [Twitter Reviews], 0)
+		formatString: 0.0%
+		lineageTag: f063be75-4ccf-47a3-83cd-2671ce382c50
+
+	measure 'Data Lineage Notice' = "0 genuine product SKUs or marketing campaigns exist in the raw corpora. Columns preserved as NULL to prevent data fabrication. Channel and topical segmentation displayed."
+		lineageTag: a9089743-296c-4637-9f7c-b78062c13323
+
+	measure 'Active Alerts' = COALESCE(CALCULATE(COUNTROWS('public alerts'), 'public alerts'[status] = "ACTIVE"), 0)
+		formatString: #,##0
+		lineageTag: 02970255-eb64-492b-9a07-64feca0cfc37
+
+	measure 'Temporal Trend Status' = IF(ISBLANK(MAX('public reviews'[review_date])), "INSUFFICIENT_TEMPORAL_DATA", "ACTIVE TIME SERIES")
+		lineageTag: 5815179a-5958-4251-af05-eab28a0b8edf
+
+	measure 'Alert Config: Negative Surge' = "Delta >= 20.0% / Rel >= 20.0%"
+		lineageTag: b4286889-b35a-4f91-845f-568074b2a41a
+
+	measure 'Alert Config: Topic Volume Surge' = "Increase >= 30.0% (Min Vol: 3)"
+		lineageTag: b673e982-c39b-4d07-af1a-56349fc43fab
+
+	measure 'Alert Config: Rating Drop' = "Drop >= 0.50 Stars"
+		lineageTag: 3d697080-a023-4a40-9af3-7a9ed671c3fb
+
+	measure 'Model Accuracy' = CALCULATE(MAX('public model_metrics'[metric_value]), 'public model_metrics'[evaluation_type] = "sentiment", 'public model_metrics'[metric_name] = "accuracy")
+		formatString: 0.0%
+		lineageTag: 18c26a91-deb8-4b7a-9a1b-1f41abfde7e0
+
+	measure 'Model Macro F1' = CALCULATE(MAX('public model_metrics'[metric_value]), 'public model_metrics'[evaluation_type] = "sentiment", 'public model_metrics'[metric_name] = "macro_f1")
+		formatString: 0.0000
+		lineageTag: 802ee17f-0592-4ed9-99ee-86b17ded3976
+
+	measure 'Model Weighted F1' = CALCULATE(MAX('public model_metrics'[metric_value]), 'public model_metrics'[evaluation_type] = "sentiment", 'public model_metrics'[metric_name] = "weighted_f1")
+		formatString: 0.0000
+		lineageTag: 1508e9a1-94a4-41df-904f-1d91a6409b1a
+
+	measure 'Validation Sample Size' = CALCULATE(MAX('public model_metrics'[validation_sample_size]), 'public model_metrics'[evaluation_type] = "sentiment", 'public model_metrics'[metric_name] = "accuracy")
+		formatString: #,##0
+		lineageTag: 5e2012bc-ffab-4dc1-b731-ad5dc74a5b49
+
+
+	column review_id
+		dataType: string
+		lineageTag: 6d491f05-7564-4f7c-bf16-ab1040629bf3
+		summarizeBy: none
+		sourceColumn: review_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_text
+		dataType: string
+		lineageTag: e1773888-7875-4e23-ad3b-7ea222edcee1
+		summarizeBy: none
+		sourceColumn: review_text
+
+		annotation SummarizationSetBy = Automatic
+
+	column cleaned_text
+		dataType: string
+		lineageTag: a0360c4a-d17d-4a30-84f2-9944bea81be2
+		summarizeBy: none
+		sourceColumn: cleaned_text
+
+		annotation SummarizationSetBy = Automatic
+
+	column rating
+		dataType: double
+		lineageTag: 8c3ca20a-25d5-4999-9a84-9da1e504a7ab
+		summarizeBy: sum
+		sourceColumn: rating
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column review_date
+		dataType: dateTime
+		formatString: Long Date
+		lineageTag: 6c832272-57a2-4d02-963d-dace28efa7cd
+		summarizeBy: none
+		sourceColumn: review_date
+
+		variation Variation
+			isDefault
+			relationship: e1306bc3-c8d0-4dbe-aa59-10bab6cf2d9a
+			defaultHierarchy: LocalDateTable_fc4b27d6-bc60-44d0-ac6a-430cf32fcc41.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column product_id
+		dataType: string
+		lineageTag: d5e1c377-eac9-462b-99bc-7c48341bbf77
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column campaign
+		dataType: string
+		lineageTag: 645f1237-1807-46ec-9187-57a6217990e1
+		summarizeBy: none
+		sourceColumn: campaign
+
+		annotation SummarizationSetBy = Automatic
+
+	column source
+		dataType: string
+		lineageTag: 9b121854-104f-40ec-a77b-b50a22293d52
+		summarizeBy: none
+		sourceColumn: source
+
+		annotation SummarizationSetBy = Automatic
+
+	column pii_detected
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: e3140ecb-bb5d-45e5-a777-96d872b64fc4
+		summarizeBy: none
+		sourceColumn: pii_detected
+
+		annotation SummarizationSetBy = Automatic
+
+	column pii_types
+		dataType: string
+		lineageTag: 5c6259f6-cebc-4621-a078-38e4998397f4
+		summarizeBy: none
+		sourceColumn: pii_types
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: efc0e3e3-9b29-4a1c-9d34-9fdbbc9bce40
+		summarizeBy: none
+		sourceColumn: created_at
+
+		variation Variation
+			isDefault
+			relationship: 99d92180-fe3e-48f2-aa42-b053ca5e449b
+			defaultHierarchy: LocalDateTable_fdf51d8e-41c2-4065-bd99-1e3f2e1e760e.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'public reviews' = m
+		mode: import
+		source =
+				let
+				  Source = PostgreSQL.Database("db.ehmgeoakcckhagdjjmmr.supabase.co", "postgres"),
+				  #"Navigation 1" = Source{[Schema = "public", Item = "reviews"]}[Data]
+				in
+				  #"Navigation 1"
+
+	annotation PBI_ResultType = Table
+

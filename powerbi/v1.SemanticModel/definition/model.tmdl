@@ -1,0 +1,32 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	sourceQueryCulture: en-IN
+	valueFilterBehavior: independent
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_QueryOrder = ["public alerts","public model_metrics","public products","public reviews","public sentiment_results","public topics"]
+
+annotation PBI_ProTooling = ["DevMode"]
+
+ref table 'public alerts'
+ref table DateTableTemplate_356730bf-81c5-48b8-90dc-5d9b340f26de
+ref table LocalDateTable_b4378a6d-3dad-4b5a-b747-755569a7ea38
+ref table 'public model_metrics'
+ref table LocalDateTable_1e1bdf3d-fc85-4e12-b05b-6de1f50430e7
+ref table 'public products'
+ref table LocalDateTable_57979bea-a60c-4c1a-b16f-0bfeae124a7d
+ref table 'public reviews'
+ref table LocalDateTable_fc4b27d6-bc60-44d0-ac6a-430cf32fcc41
+ref table LocalDateTable_fdf51d8e-41c2-4065-bd99-1e3f2e1e760e
+ref table 'public sentiment_results'
+ref table LocalDateTable_31d49bd3-2b2f-4b70-a77b-f59bd8aec409
+ref table 'public topics'
+ref table LocalDateTable_9b2a6ed1-3209-44c5-9700-112901b4da98
+
+ref cultureInfo en-US
+

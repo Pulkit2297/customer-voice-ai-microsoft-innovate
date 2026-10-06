@@ -1,0 +1,52 @@
+table 'public products'
+	lineageTag: 91cf7df6-65c8-4599-a175-c01e7491bf90
+
+	column product_id
+		dataType: string
+		lineageTag: b6b5fa82-889f-49d3-9df0-96a46335532c
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_name
+		dataType: string
+		lineageTag: 9ef0d58d-2737-47f6-8761-c1d092c20cfa
+		summarizeBy: none
+		sourceColumn: product_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: d81cdced-aa24-4ca7-b847-9f2b0d76dafd
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 05a52047-b19b-427a-8689-5cb1485db29c
+		summarizeBy: none
+		sourceColumn: created_at
+
+		variation Variation
+			isDefault
+			relationship: 91ef29ae-58a3-4141-b213-f68aa9770728
+			defaultHierarchy: LocalDateTable_57979bea-a60c-4c1a-b16f-0bfeae124a7d.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'public products' = m
+		mode: import
+		source =
+				let
+				  Source = PostgreSQL.Database("db.ehmgeoakcckhagdjjmmr.supabase.co", "postgres"),
+				  #"Navigation 1" = Source{[Schema = "public", Item = "products"]}[Data]
+				in
+				  #"Navigation 1"
+
+	annotation PBI_ResultType = Table
+

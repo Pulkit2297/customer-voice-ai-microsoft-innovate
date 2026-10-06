@@ -1,0 +1,102 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "p5_table_metrics",
+  "position": {
+    "x": 40,
+    "y": 230,
+    "z": 5,
+    "height": 800,
+    "width": 850,
+    "tabOrder": 5
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public model_metrics"
+                    }
+                  },
+                  "Property": "evaluation_type"
+                }
+              },
+              "queryRef": "public model_metrics.evaluation_type",
+              "nativeQueryRef": "Eval Type"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public model_metrics"
+                    }
+                  },
+                  "Property": "category"
+                }
+              },
+              "queryRef": "public model_metrics.category",
+              "nativeQueryRef": "Class / Category"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public model_metrics"
+                    }
+                  },
+                  "Property": "metric_name"
+                }
+              },
+              "queryRef": "public model_metrics.metric_name",
+              "nativeQueryRef": "Metric Name"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public model_metrics"
+                    }
+                  },
+                  "Property": "metric_value"
+                }
+              },
+              "queryRef": "public model_metrics.metric_value",
+              "nativeQueryRef": "Metric Value"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Empirical Benchmark Metrics (data/validation/validation_set.csv)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

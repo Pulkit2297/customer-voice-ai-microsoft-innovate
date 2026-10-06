@@ -1,0 +1,60 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "p4_kpi_topic_surge_cutoff",
+  "position": {
+    "x": 1450,
+    "y": 40,
+    "z": 4,
+    "height": 160,
+    "width": 430,
+    "tabOrder": 4
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public reviews"
+                    }
+                  },
+                  "Property": "Alert Config: Topic Volume Surge"
+                }
+              },
+              "queryRef": "public reviews.Alert Config: Topic Volume Surge",
+              "nativeQueryRef": "Topic Volume Surge Cutoff"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Topic Volume Surge Cutoff'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

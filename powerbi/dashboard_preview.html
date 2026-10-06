@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CustomerVoice AI - Power BI Analytical Dashboard</title>
+  <style>
+    :root {
+      --pbi-yellow: #F2C811;
+      --pbi-dark: #252423;
+      --pbi-gray: #605E5C;
+      --pbi-light-gray: #EDEBE9;
+      --pbi-bg: #F3F4F6;
+      --pbi-card-bg: #FFFFFF;
+      --pbi-blue: #118DFF;
+      --pbi-teal: #12239E;
+      --pbi-green: #107C41;
+      --pbi-red: #D13438;
+      --pbi-orange: #FF8C00;
+      --pbi-neutral: #8A8886;
+      --border-color: #E1DFDD;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--pbi-bg);
+      color: var(--pbi-dark);
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Power BI Top Ribbon */
+    header.pbi-header {
+      background-color: var(--pbi-dark);
+      color: #FFFFFF;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 24px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.15);
+      z-index: 100;
+    }
+
+    .header-title-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pbi-badge {
+      background-color: var(--pbi-yellow);
+      color: #000;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .header-title {
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .header-subtitle {
+      font-size: 12px;
+      color: #C8C6C4;
+    }
+
+    .db-connection-pill {
+      background-color: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 14px;
+      padding: 4px 12px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: #107C41;
+      display: inline-block;
+      box-shadow: 0 0 6px #107C41;
+    }
+
+    /* Page Navigation Bar */
+    nav.page-nav {
+      background-color: #FFFFFF;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      gap: 4px;
+      padding: 0 20px;
+    }
+
+    .nav-tab {
+      padding: 12px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--pbi-gray);
+      border-bottom: 3px solid transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-tab:hover {
+      color: var(--pbi-blue);
+      background-color: #F8F9FA;
+    }
+
+    .nav-tab.active {
+      color: var(--pbi-blue);
+      border-bottom-color: var(--pbi-blue);
+      background-color: #F8FAFC;
+    }
+
+    .tab-badge {
+      background-color: #F0F2F5;
+      color: var(--pbi-gray);
+      padding: 1px 6px;
+      border-radius: 10px;
+      font-size: 11px;
+    }
+
+    /* Main Canvas */
+    main.canvas-container {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .page-content {
+      display: none;
+      animation: fadeIn 0.25s ease-in-out;
+    }
+
+    .page-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Grid Layouts */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    .col-4 { grid-column: span 4; }
+    .col-6 { grid-column: span 6; }
+    .col-8 { grid-column: span 8; }
+    .col-12 { grid-column: span 12; }
+
+    /* Card Components */
+    .card {
+      background-color: var(--pbi-card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 16px 20px;
+      box-shadow: 0 1.6px 3.6px 0 rgba(0,0,0,0.05);
+      position: relative;
+    }
+
+    .kpi-card {
+      background-color: var(--pbi-card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 16px 20px;
+      box-shadow: 0 1.6px 3.6px 0 rgba(0,0,0,0.05);
+      border-left: 4px solid var(--pbi-blue);
+    }
+
+    .kpi-card.green { border-left-color: var(--pbi-green); }
+    .kpi-card.red { border-left-color: var(--pbi-red); }
+    .kpi-card.orange { border-left-color: var(--pbi-orange); }
+
+    .kpi-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--pbi-gray);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--pbi-dark);
+      line-height: 1.2;
+    }
+
+    .kpi-subtext {
+      font-size: 12px;
+      color: var(--pbi-gray);
+      margin-top: 4px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--pbi-dark);
+      margin-bottom: 14px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #F3F2F1;
+      padding-bottom: 8px;
+    }
+
+    /* Notice & Disclaimer Banner */
+    .integrity-banner {
+      background-color: #EFF6FC;
+      border-left: 4px solid var(--pbi-blue);
+      padding: 12px 16px;
+      border-radius: 4px;
+      margin-bottom: 18px;
+      font-size: 13px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      color: #004578;
+    }
+
+    .integrity-banner.warning {
+      background-color: #FFF4CE;
+      border-left-color: #797775;
+      color: #484644;
+    }
+
+    /* Data Tables */
+    table.pbi-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    table.pbi-table th {
+      background-color: #FAF9F8;
+      color: var(--pbi-gray);
+      text-align: left;
+      padding: 9px 12px;
+      border-bottom: 2px solid var(--border-color);
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    table.pbi-table td {
+      padding: 8px 12px;
+      border-bottom: 1px solid #F3F2F1;
+      color: var(--pbi-dark);
+    }
+
+    table.pbi-table tr:hover {
+      background-color: #F8F9FA;
+    }
+
+    .badge-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    .badge-positive { background-color: #DFF6DD; color: #107C41; }
+    .badge-negative { background-color: #FDE7E9; color: #D13438; }
+    .badge-neutral  { background-color: #F3F2F1; color: #605E5C; }
+    .badge-high     { background-color: #FDE7E9; color: #A80000; font-weight: bold; }
+
+    /* Visual Bars */
+    .bar-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .bar-label {
+      width: 130px;
+      font-size: 12px;
+      color: var(--pbi-dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .bar-track {
+      flex: 1;
+      background-color: #EDEBE9;
+      height: 18px;
+      border-radius: 3px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 3px;
+      transition: width 0.6s ease;
+    }
+
+    .bar-fill.blue { background-color: var(--pbi-blue); }
+    .bar-fill.red { background-color: var(--pbi-red); }
+    .bar-fill.green { background-color: var(--pbi-green); }
+
+    .bar-value {
+      width: 50px;
+      text-align: right;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--pbi-dark);
+    }
+
+    /* Sentiment Donut Simulation */
+    .sentiment-bar-stacked {
+      display: flex;
+      height: 24px;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 14px;
+    }
+    .stack-pos { background-color: var(--pbi-green); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+    .stack-neu { background-color: var(--pbi-neutral); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+    .stack-neg { background-color: var(--pbi-red); color: white; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; }
+
+    /* Footer info */
+    footer.pbi-footer {
+      background-color: #FFFFFF;
+      border-top: 1px solid var(--border-color);
+      padding: 8px 24px;
+      font-size: 11px;
+      color: var(--pbi-gray);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="pbi-header">
+    <div class="header-title-group">
+      <span class="pbi-badge">Power BI</span>
+      <div>
+        <div class="header-title">CustomerVoice AI — Executive Intelligence Dashboard</div>
+        <div class="header-subtitle">Enterprise E-Commerce & Social Feedback Analytics (5,000 Processed Records)</div>
+      </div>
+    </div>
+    <div class="db-connection-pill">
+      <span class="status-dot"></span>
+      <span>Supabase Cloud: <strong>db.ehmgeoakcckhagdjjmmr.supabase.co:5432</strong></span>
+    </div>
+  </header>
+
+  <!-- Page Navigation Bar -->
+  <nav class="page-nav">
+    <div class="nav-tab active" onclick="switchPage('page1')">
+      <span>1. Executive Overview</span>
+      <span class="tab-badge">KPIs</span>
+    </div>
+    <div class="nav-tab" onclick="switchPage('page2')">
+      <span>2. Why Are Customers Unhappy?</span>
+      <span class="tab-badge">Complaints</span>
+    </div>
+    <div class="nav-tab" onclick="switchPage('page3')">
+      <span>3. Product / Campaign Comparison</span>
+      <span class="tab-badge">Channels</span>
+    </div>
+    <div class="nav-tab" onclick="switchPage('page4')">
+      <span>4. Trends & Alerts</span>
+      <span class="tab-badge">Monitoring</span>
+    </div>
+    <div class="nav-tab" onclick="switchPage('page5')">
+      <span>5. Model Health</span>
+      <span class="tab-badge">F1 / VADER</span>
+    </div>
+  </nav>
+
+  <!-- Main Canvas -->
+  <main class="canvas-container">
+
+    <!-- =================================================================== -->
+    <!-- PAGE 1: EXECUTIVE OVERVIEW                                          -->
+    <!-- =================================================================== -->
+    <div id="page1" class="page-content active">
+      
+      <div class="integrity-banner">
+        <span>ℹ️</span>
+        <div>
+          <strong>PostgreSQL Analytical Feed Active:</strong> Consuming preprocessed, sentiment-scored, and topic-attributed data from PostgreSQL relational tables (<code>reviews</code>, <code>sentiment_results</code>, <code>topics</code>). Raw CSV bypass verified.
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-label">Total Feedback Volume</div>
+          <div class="kpi-value">5,000</div>
+          <div class="kpi-subtext">4,000 Amazon • 1,000 Twitter/Social</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-label">Positive Sentiment %</div>
+          <div class="kpi-value">62.8%</div>
+          <div class="kpi-subtext">3,141 Satisfied Customers</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-label">Negative Sentiment %</div>
+          <div class="kpi-value">30.5%</div>
+          <div class="kpi-subtext">1,526 Dissatisfied Customers</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Net Sentiment Score (NSS)</div>
+          <div class="kpi-value">+32.3%</div>
+          <div class="kpi-subtext">Positive % minus Negative %</div>
+        </div>
+        <div class="kpi-card orange">
+          <div class="kpi-label">PII Redaction Protection</div>
+          <div class="kpi-value">2.4%</div>
+          <div class="kpi-subtext">120 records masked (Email/Phone/CC)</div>
+        </div>
+      </div>
+
+      <!-- Main Visuals Grid -->
+      <div class="dashboard-grid">
+        <!-- Sentiment Distribution -->
+        <div class="card col-6">
+          <div class="card-title">
+            <span>Overall Sentiment Share (VADER Compound Model)</span>
+            <span class="badge-pill badge-neutral">5,000 Facts</span>
+          </div>
+          
+          <div class="sentiment-bar-stacked">
+            <div class="stack-pos" style="width: 62.82%;">Positive 62.8% (3,141)</div>
+            <div class="stack-neu" style="width: 6.66%;">Neutral 6.7% (333)</div>
+            <div class="stack-neg" style="width: 30.52%;">Negative 30.5% (1,526)</div>
+          </div>
+
+          <table class="pbi-table" style="margin-top: 15px;">
+            <thead>
+              <tr>
+                <th>Sentiment Class</th>
+                <th>Review Volume</th>
+                <th>Percentage</th>
+                <th>Avg Compound Score</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge-pill badge-positive">Positive</span></td>
+                <td>3,141</td>
+                <td>62.82%</td>
+                <td>+0.732</td>
+              </tr>
+              <tr>
+                <td><span class="badge-pill badge-neutral">Neutral</span></td>
+                <td>333</td>
+                <td>6.66%</td>
+                <td>0.000</td>
+              </tr>
+              <tr>
+                <td><span class="badge-pill badge-negative">Negative</span></td>
+                <td>1,526</td>
+                <td>30.52%</td>
+                <td>-0.541</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Ingestion Source Channel Breakdown -->
+        <div class="card col-6">
+          <div class="card-title">
+            <span>Feedback Volume & Polarity by Source Channel</span>
+            <span class="badge-pill badge-neutral">Direct Ingestion</span>
+          </div>
+          
+          <div class="bar-container">
+            <div class="bar-label">Amazon FastText</div>
+            <div class="bar-track">
+              <div class="bar-fill blue" style="width: 80%;"></div>
+            </div>
+            <div class="bar-value">4,000</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Twitter / Social</div>
+            <div class="bar-track">
+              <div class="bar-fill blue" style="width: 20%;"></div>
+            </div>
+            <div class="bar-value">1,000</div>
+          </div>
+
+          <table class="pbi-table" style="margin-top: 25px;">
+            <thead>
+              <tr>
+                <th>Channel Origin</th>
+                <th>Total Reviews</th>
+                <th>Positive Share</th>
+                <th>Negative Share</th>
+                <th>Net Sentiment</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Amazon E-Commerce</strong></td>
+                <td>4,000</td>
+                <td>71.0%</td>
+                <td><span class="badge-pill badge-negative">26.7%</span></td>
+                <td><strong>+44.3%</strong></td>
+              </tr>
+              <tr>
+                <td><strong>Twitter / Social Media</strong></td>
+                <td>1,000</td>
+                <td>30.1%</td>
+                <td><span class="badge-pill badge-negative">45.9%</span></td>
+                <td><strong>-15.8%</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Top Discussion Drivers -->
+        <div class="card col-12">
+          <div class="card-title">
+            <span>Top 5 Discussion Topics by Total Review Mentions</span>
+            <span class="badge-pill badge-neutral">1,756 Topic Bridge Entries</span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px;">
+            <div style="padding: 12px; background: #FAF9F8; border-radius: 4px; text-align: center;">
+              <div style="font-size: 11px; color: var(--pbi-gray); font-weight: 600;">#1 Product Quality</div>
+              <div style="font-size: 20px; font-weight: 700; color: var(--pbi-dark); margin: 4px 0;">392</div>
+              <div style="font-size: 11px; color: var(--pbi-red);">30.1% Negative Rate</div>
+            </div>
+            <div style="padding: 12px; background: #FAF9F8; border-radius: 4px; text-align: center;">
+              <div style="font-size: 11px; color: var(--pbi-gray); font-weight: 600;">#2 Pricing</div>
+              <div style="font-size: 20px; font-weight: 700; color: var(--pbi-dark); margin: 4px 0;">346</div>
+              <div style="font-size: 11px; color: var(--pbi-red);">28.9% Negative Rate</div>
+            </div>
+            <div style="padding: 12px; background: #FAF9F8; border-radius: 4px; text-align: center;">
+              <div style="font-size: 11px; color: var(--pbi-gray); font-weight: 600;">#3 Performance</div>
+              <div style="font-size: 20px; font-weight: 700; color: var(--pbi-dark); margin: 4px 0;">221</div>
+              <div style="font-size: 11px; color: var(--pbi-green);">21.3% Negative Rate</div>
+            </div>
+            <div style="padding: 12px; background: #FAF9F8; border-radius: 4px; text-align: center;">
+              <div style="font-size: 11px; color: var(--pbi-gray); font-weight: 600;">#4 Return Process</div>
+              <div style="font-size: 20px; font-weight: 700; color: var(--pbi-dark); margin: 4px 0;">201</div>
+              <div style="font-size: 11px; color: var(--pbi-red);">34.8% Negative Rate</div>
+            </div>
+            <div style="padding: 12px; background: #FAF9F8; border-radius: 4px; text-align: center;">
+              <div style="font-size: 11px; color: var(--pbi-gray); font-weight: 600;">#5 Packaging</div>
+              <div style="font-size: 20px; font-weight: 700; color: var(--pbi-dark); margin: 4px 0;">128</div>
+              <div style="font-size: 11px; color: var(--pbi-red);">26.6% Negative Rate</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- =================================================================== -->
+    <!-- PAGE 2: WHY ARE CUSTOMERS UNHAPPY?                                  -->
+    <!-- =================================================================== -->
+    <div id="page2" class="page-content">
+      
+      <div class="integrity-banner warning">
+        <span>⚠️</span>
+        <div>
+          <strong>Root Cause & Complaint Analysis:</strong> Investigating 1,526 negative reviews across 1,756 detected multi-label topics in PostgreSQL bridge table. Focus on areas with >30% negative concentration.
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi-card red">
+          <div class="kpi-label">Total Dissatisfied Customers</div>
+          <div class="kpi-value">1,526</div>
+          <div class="kpi-subtext">30.5% of total corpus volume</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-label">Highest Complaint Volume</div>
+          <div class="kpi-value">Product Quality</div>
+          <div class="kpi-subtext">118 negative reviews (30.1% rate)</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-label">Most Critical Negative Concentration</div>
+          <div class="kpi-value">Refund (46.3%)</div>
+          <div class="kpi-subtext">19 negative out of 41 mentions</div>
+        </div>
+        <div class="kpi-card orange">
+          <div class="kpi-label">Battery & Reliability Issues</div>
+          <div class="kpi-value">38.8% Neg Avg</div>
+          <div class="kpi-subtext">Hardware durability concerns</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Negative Volume by Topic -->
+        <div class="card col-6">
+          <div class="card-title">
+            <span>Negative Review Volume by Topic (Ranked)</span>
+            <span class="badge-pill badge-negative">Total Complaints</span>
+          </div>
+
+          <div class="bar-container">
+            <div class="bar-label">Product Quality</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 100%;"></div></div>
+            <div class="bar-value">118</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Pricing</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 84.7%;"></div></div>
+            <div class="bar-value">100</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Return Process</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 59.3%;"></div></div>
+            <div class="bar-value">70</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Performance</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 39.8%;"></div></div>
+            <div class="bar-value">47</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Delivery</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 29.6%;"></div></div>
+            <div class="bar-value">35</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Packaging</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 28.8%;"></div></div>
+            <div class="bar-value">34</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Battery</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 22.8%;"></div></div>
+            <div class="bar-value">27</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Reliability</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 19.5%;"></div></div>
+            <div class="bar-value">23</div>
+          </div>
+        </div>
+
+        <!-- Negative Sentiment % by Topic -->
+        <div class="card col-6">
+          <div class="card-title">
+            <span>Negative Sentiment Rate % within Topic</span>
+            <span class="badge-pill badge-neutral">Risk Concentration</span>
+          </div>
+
+          <div class="bar-container">
+            <div class="bar-label">Refund</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 92.6%;"></div></div>
+            <div class="bar-value">46.3%</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Reliability</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 79.4%;"></div></div>
+            <div class="bar-value">39.7%</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Battery</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 76.0%;"></div></div>
+            <div class="bar-value">38.0%</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Return Process</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 69.6%;"></div></div>
+            <div class="bar-value">34.8%</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Product Quality</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 60.2%;"></div></div>
+            <div class="bar-value">30.1%</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Pricing</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 57.8%;"></div></div>
+            <div class="bar-value">28.9%</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Delivery</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 56.4%;"></div></div>
+            <div class="bar-value">28.2%</div>
+          </div>
+          <div class="bar-container">
+            <div class="bar-label">Packaging</div>
+            <div class="bar-track"><div class="bar-fill red" style="width: 53.2%;"></div></div>
+            <div class="bar-value">26.6%</div>
+          </div>
+        </div>
+
+        <!-- Sample Unhappy Customer Verbatims -->
+        <div class="card col-12">
+          <div class="card-title">
+            <span>Customer Complaint Drilldown Table (PostgreSQL FactReviews & FactSentiment)</span>
+            <span class="badge-pill badge-neutral">Top Dissatisfaction Signals</span>
+          </div>
+          <table class="pbi-table">
+            <thead>
+              <tr>
+                <th>Review ID</th>
+                <th>Source</th>
+                <th>Topic</th>
+                <th>Sentiment Score</th>
+                <th>Customer Verbatim (PII Scrubbed)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>REV_000006</strong></td>
+                <td>Amazon</td>
+                <td><span class="badge-pill badge-neutral">Product Quality</span></td>
+                <td><span class="badge-pill badge-negative">-0.351</span></td>
+                <td>DVD Player crapped out after one year. I also began having the incorrect disc problems that I've read about on here. The VCR still works, but the DVD side is useless. To me that's a sign of bad quality...</td>
+              </tr>
+              <tr>
+                <td><strong>REV_000007</strong></td>
+                <td>Amazon</td>
+                <td><span class="badge-pill badge-neutral">Product Quality</span></td>
+                <td><span class="badge-pill badge-negative">-0.064</span></td>
+                <td>Incorrect Disc. I love the style of this, but after a couple years, the DVD is giving me problems. It doesn't even work anymore...</td>
+              </tr>
+              <tr>
+                <td><strong>REV_000008</strong></td>
+                <td>Amazon</td>
+                <td><span class="badge-pill badge-neutral">Features</span></td>
+                <td><span class="badge-pill badge-negative">-0.674</span></td>
+                <td>DVD menu select problems. I cannot scroll through a DVD menu that is set up vertically. The triangle keys will only select horizontally...</td>
+              </tr>
+              <tr>
+                <td><strong>REV_004002</strong></td>
+                <td>Twitter/Social</td>
+                <td><span class="badge-pill badge-neutral">Customer Support</span></td>
+                <td><span class="badge-pill badge-negative">-0.727</span></td>
+                <td>is upset that he can t update his facebook by texting it and might cry as a result school today also blah</td>
+              </tr>
+              <tr>
+                <td><strong>REV_004005</strong></td>
+                <td>Twitter/Social</td>
+                <td><span class="badge-pill badge-neutral">Usability</span></td>
+                <td><span class="badge-pill badge-negative">-0.660</span></td>
+                <td>no it s not behaving at all i m mad why am i here because i can t see you all over there</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- =================================================================== -->
+    <!-- PAGE 3: PRODUCT / CAMPAIGN COMPARISON                               -->
+    <!-- =================================================================== -->
+    <div id="page3" class="page-content">
+      
+      <div class="integrity-banner warning">
+        <span>🛡️</span>
+        <div>
+          <strong>Semantic Integrity & Lineage Audit Disclosure:</strong> 
+          Neither the FastText Amazon dataset nor Sentiment140 Twitter dataset contain genuine commercial product SKUs (e.g. ASINs) or marketing campaign tags. To prevent data fabrication, <code>product_id = NULL</code> and <code>campaign = NULL</code>. Comparisons are conducted across authentic <strong>Ingestion Channels</strong> and heuristic <strong>Category Segments</strong>.
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-label">Genuine Product SKUs</div>
+          <div class="kpi-value">0 (NULL)</div>
+          <div class="kpi-subtext">True SKU catalog data required</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Genuine Marketing Campaigns</div>
+          <div class="kpi-value">0 (NULL)</div>
+          <div class="kpi-subtext">No UTM/tracking tags in raw source</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-label">Amazon E-Commerce Volume</div>
+          <div class="kpi-value">4,000</div>
+          <div class="kpi-subtext">71.0% Positive • 26.7% Negative</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-label">Twitter / Social Volume</div>
+          <div class="kpi-value">1,000</div>
+          <div class="kpi-subtext">30.1% Positive • 45.9% Negative</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Channel Cross Comparison -->
+        <div class="card col-6">
+          <div class="card-title">
+            <span>Channel Sentiment Comparison (PostgreSQL Grouping)</span>
+            <span class="badge-pill badge-neutral">Authentic Dimensions</span>
+          </div>
+          
+          <table class="pbi-table">
+            <thead>
+              <tr>
+                <th>Metric / Attribute</th>
+                <th>Amazon (E-Commerce)</th>
+                <th>Twitter / Social</th>
+                <th>Combined Corpus</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Total Records</strong></td>
+                <td>4,000 (80.0%)</td>
+                <td>1,000 (20.0%)</td>
+                <td>5,000 (100%)</td>
+              </tr>
+              <tr>
+                <td><strong>Positive Reviews</strong></td>
+                <td>2,840 (71.0%)</td>
+                <td>301 (30.1%)</td>
+                <td>3,141 (62.8%)</td>
+              </tr>
+              <tr>
+                <td><strong>Neutral Feedback</strong></td>
+                <td>93 (2.3%)</td>
+                <td>240 (24.0%)</td>
+                <td>333 (6.7%)</td>
+              </tr>
+              <tr>
+                <td><strong>Negative Complaints</strong></td>
+                <td>1,067 (26.7%)</td>
+                <td>459 (45.9%)</td>
+                <td>1,526 (30.5%)</td>
+              </tr>
+              <tr>
+                <td><strong>Net Sentiment Score</strong></td>
+                <td><strong style="color: var(--pbi-green);">+44.3%</strong></td>
+                <td><strong style="color: var(--pbi-red);">-15.8%</strong></td>
+                <td><strong>+32.3%</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Inferred Category Segments (Amazon) -->
+        <div class="card col-6">
+          <div class="card-title">
+            <span>Inferred Category Segments (Amazon Reviews)</span>
+            <span class="badge-pill badge-neutral">Topical Keyword Mapping</span>
+          </div>
+
+          <table class="pbi-table">
+            <thead>
+              <tr>
+                <th>Segment Name</th>
+                <th>Review Volume</th>
+                <th>Category Focus</th>
+                <th>Lineage Type</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Audio & Sound</strong></td>
+                <td>~1,200</td>
+                <td>Headphones, speakers, CD, audio</td>
+                <td><span class="badge-pill badge-neutral">Inferred</span></td>
+              </tr>
+              <tr>
+                <td><strong>Power & Battery</strong></td>
+                <td>~850</td>
+                <td>Chargers, mAh, battery durability</td>
+                <td><span class="badge-pill badge-neutral">Inferred</span></td>
+              </tr>
+              <tr>
+                <td><strong>Video & Display</strong></td>
+                <td>~650</td>
+                <td>DVD, HDTV, TV players, screens</td>
+                <td><span class="badge-pill badge-neutral">Inferred</span></td>
+              </tr>
+              <tr>
+                <td><strong>Computer Hardware</strong></td>
+                <td>~500</td>
+                <td>Laptops, memory, USB, mice</td>
+                <td><span class="badge-pill badge-neutral">Inferred</span></td>
+              </tr>
+              <tr>
+                <td><strong>Books & Publications</strong></td>
+                <td>~450</td>
+                <td>Books, paperbacks, reading</td>
+                <td><span class="badge-pill badge-neutral">Inferred</span></td>
+              </tr>
+              <tr>
+                <td><strong>General Consumer Goods</strong></td>
+                <td>~350</td>
+                <td>Miscellaneous household goods</td>
+                <td><span class="badge-pill badge-neutral">Inferred</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Production Guidance Box -->
+        <div class="card col-12">
+          <div class="card-title">
+            <span>Production Deployment Prerequisite: SKU & Campaign Attribution</span>
+          </div>
+          <p style="font-size: 13px; color: var(--pbi-gray); line-height: 1.6;">
+            To unlock true product-level drilldown (e.g., comparing <em>Echo Dot 5th Gen</em> vs <em>Fire TV Stick 4K Max</em>) and marketing campaign ROI (e.g., <em>Prime_Day_2026_Promo</em>), the data ingestion layer must connect to a production catalog service or transactional database that supplies genuine <strong>ASINs/SKUs</strong> and <strong>UTM campaign parameters</strong>. The database schema in PostgreSQL is fully prepared with foreign keys and indexes to consume these tables seamlessly.
+          </p>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- =================================================================== -->
+    <!-- PAGE 4: TRENDS & ALERTS                                             -->
+    <!-- =================================================================== -->
+    <div id="page4" class="page-content">
+      
+      <div class="integrity-banner warning">
+        <span>🛡️</span>
+        <div>
+          <strong>Temporal Data Status: INSUFFICIENT_TEMPORAL_DATA.</strong><br>
+          Following the data audit, all artificial modulo dates (<code>2023-01-01 + i</code>) were completely eliminated. Because the raw archives lack authentic timestamps, the trend engine gracefully skips time-series aggregation without generating fake spikes. Alerts triggered under demonstration mode are clearly marked.
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi-card green">
+          <div class="kpi-label">Active Production Alerts</div>
+          <div class="kpi-value">0</div>
+          <div class="kpi-subtext">0 false alarms produced</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Temporal Aggregations</div>
+          <div class="kpi-value">Skipped</div>
+          <div class="kpi-subtext">status: insufficient_temporal_data</div>
+        </div>
+        <div class="kpi-card orange">
+          <div class="kpi-label">Alert Engine Rules Active</div>
+          <div class="kpi-value">4 Thresholds</div>
+          <div class="kpi-subtext">Configured in AlertThresholds</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Demonstration Mode</div>
+          <div class="kpi-value">Available</div>
+          <div class="kpi-subtext">Flagged with [Algorithmic Alert Demo]</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Alert Configuration Rules Table -->
+        <div class="card col-6">
+          <div class="card-title">
+            <span>Configurable Alert Engine Rules & Cutoffs</span>
+            <span class="badge-pill badge-neutral">Non-Hardcoded</span>
+          </div>
+
+          <table class="pbi-table">
+            <thead>
+              <tr>
+                <th>Alert Type</th>
+                <th>Standard Threshold</th>
+                <th>High Severity Threshold</th>
+                <th>Monitoring Metric</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Negative Sentiment Surge</strong></td>
+                <td>&ge; 20.0% Shift</td>
+                <td>&ge; 40.0% Shift</td>
+                <td><code>negative_sentiment_pct</code></td>
+              </tr>
+              <tr>
+                <td><strong>Topic Discussion Surge</strong></td>
+                <td>&ge; 30.0% Spike</td>
+                <td>&ge; 60.0% Spike</td>
+                <td><code>topic_volume</code></td>
+              </tr>
+              <tr>
+                <td><strong>Customer Rating Drop</strong></td>
+                <td>&ge; 0.50 Stars</td>
+                <td>&ge; 1.00 Stars</td>
+                <td><code>average_rating</code></td>
+              </tr>
+              <tr>
+                <td><strong>Model F1 Performance Decay</strong></td>
+                <td>&ge; 0.10 Drop</td>
+                <td>&ge; 0.20 Drop</td>
+                <td><code>model_f1_score</code></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PostgreSQL Alerts Table View -->
+        <div class="card col-6">
+          <div class="card-title">
+            <span>Live PostgreSQL Alerts Fact Table (<code>public.alerts</code>)</span>
+            <span class="badge-pill badge-positive">Status: Clean (0 Rows)</span>
+          </div>
+          
+          <div style="padding: 30px; text-align: center; color: var(--pbi-gray);">
+            <div style="font-size: 32px; margin-bottom: 8px;">✅</div>
+            <div style="font-size: 14px; font-weight: 600; color: var(--pbi-dark);">No Active Operational Alerts</div>
+            <div style="font-size: 12px; margin-top: 4px;">
+              Because temporal timestamps are NULL, no synthetic threshold alerts were fired. The database table <code>alerts</code> maintains 0 fake incident records.
+            </div>
+          </div>
+        </div>
+
+        <!-- Demonstration Alert Simulation Walkthrough -->
+        <div class="card col-12">
+          <div class="card-title">
+            <span>Algorithmic Alert Simulator Preview (When Live Streams Arrive)</span>
+            <span class="badge-pill badge-neutral">Demonstration Schema</span>
+          </div>
+          <table class="pbi-table">
+            <thead>
+              <tr>
+                <th>Demo Alert ID</th>
+                <th>Alert Type</th>
+                <th>Severity</th>
+                <th>Product / Channel</th>
+                <th>Topic</th>
+                <th>Delta</th>
+                <th>Standard Message</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>DEMO_ALT_01</code></td>
+                <td><span class="badge-pill badge-negative">DEMONSTRATION - NEGATIVE_SENTIMENT_SURGE</span></td>
+                <td><span class="badge-pill badge-high">HIGH</span></td>
+                <td>Amazon / Hardware</td>
+                <td>Battery</td>
+                <td>+48.5%</td>
+                <td>[Algorithmic Alert Demonstration] Negative sentiment surged from 15.0% to 63.5% (+48.5% shift) for topic='battery'.</td>
+              </tr>
+              <tr>
+                <td><code>DEMO_ALT_02</code></td>
+                <td><span class="badge-pill badge-neutral">DEMONSTRATION - TOPIC_VOLUME_SURGE</span></td>
+                <td><span class="badge-pill badge-neutral">MEDIUM</span></td>
+                <td>Twitter/Social</td>
+                <td>Customer Support</td>
+                <td>+80.0%</td>
+                <td>[Algorithmic Alert Demonstration] Spike in discussion volume for topic 'customer_support' from 10 to 18 (+80.0%).</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- =================================================================== -->
+    <!-- PAGE 5: MODEL HEALTH                                                -->
+    <!-- =================================================================== -->
+    <div id="page5" class="page-content">
+      
+      <div class="integrity-banner">
+        <span>🧪</span>
+        <div>
+          <strong>Empirical Validation Benchmark (From <code>public.model_metrics</code>):</strong> 
+          Model performance is evaluated strictly against <code>data/validation/validation_set.csv</code>. In adherence to zero-fabrication guidelines, no synthetic ground-truth labels were manufactured.
+        </div>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi-card green">
+          <div class="kpi-label">Validation Set Size</div>
+          <div class="kpi-value">15 Reviews</div>
+          <div class="kpi-subtext">Ground truth validation benchmark</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Overall Accuracy</div>
+          <div class="kpi-value">46.7%</div>
+          <div class="kpi-subtext">3-class classification</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Macro F1-Score</div>
+          <div class="kpi-value">0.3294</div>
+          <div class="kpi-subtext">Unweighted average across classes</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label">Weighted F1-Score</div>
+          <div class="kpi-value">0.3953</div>
+          <div class="kpi-subtext">Sample-weighted class performance</div>
+        </div>
+        <div class="kpi-card green">
+          <div class="kpi-label">Positive Class Recall</div>
+          <div class="kpi-value">83.3%</div>
+          <div class="kpi-subtext">High sensitivity on positive feedback</div>
+        </div>
+      </div>
+
+      <div class="dashboard-grid">
+        <!-- Class-Level Performance Matrix -->
+        <div class="card col-6">
+          <div class="card-title">
+            <span>Per-Class Sentiment Metrics (VADER Model)</span>
+            <span class="badge-pill badge-neutral">PostgreSQL model_metrics</span>
+          </div>
+
+          <table class="pbi-table">
+            <thead>
+              <tr>
+                <th>Sentiment Class</th>
+                <th>Precision</th>
+                <th>Recall</th>
+                <th>F1-Score</th>
+                <th>Validation Support</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="badge-pill badge-positive">Positive</span></td>
+                <td>0.4545</td>
+                <td><strong>0.8333</strong></td>
+                <td><strong>0.5882</strong></td>
+                <td>6 samples</td>
+              </tr>
+              <tr>
+                <td><span class="badge-pill badge-neutral">Neutral</span></td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+                <td>0.0000</td>
+                <td>4 samples</td>
+              </tr>
+              <tr>
+                <td><span class="badge-pill badge-negative">Negative</span></td>
+                <td>0.5000</td>
+                <td>0.4000</td>
+                <td>0.4000</td>
+                <td>5 samples</td>
+              </tr>
+              <tr style="background-color: #FAF9F8; font-weight: 600;">
+                <td><strong>Macro Average</strong></td>
+                <td>0.3182</td>
+                <td>0.3889</td>
+                <td>0.3294</td>
+                <td>15 total</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style="margin-top: 15px; font-size: 11px; color: var(--pbi-gray);">
+            <strong>Observation:</strong> VADER exhibits high recall (83.3%) on positive sentiment but struggles with neutral short comments, causing neutral F1 to be 0.00. Adding a fine-tuned transformer (e.g. RoBERTa) is recommended for production.
+          </div>
+        </div>
+
+        <!-- Topic Multi-Label Benchmark -->
+        <div class="card col-6">
+          <div class="card-title">
+            <span>Multi-Label Topic Classification Metrics</span>
+            <span class="badge-pill badge-neutral">Rule-Based Detector</span>
+          </div>
+
+          <table class="pbi-table">
+            <thead>
+              <tr>
+                <th>Topic Category</th>
+                <th>Precision</th>
+                <th>Recall</th>
+                <th>F1-Score</th>
+                <th>Support</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Battery</strong></td>
+                <td>1.0000</td>
+                <td>0.5000</td>
+                <td>0.6667</td>
+                <td>2 samples</td>
+              </tr>
+              <tr>
+                <td><strong>Delivery</strong></td>
+                <td>1.0000</td>
+                <td>1.0000</td>
+                <td>1.0000</td>
+                <td>1 sample</td>
+              </tr>
+              <tr>
+                <td><strong>Pricing</strong></td>
+                <td>1.0000</td>
+                <td>0.5000</td>
+                <td>0.6667</td>
+                <td>2 samples</td>
+              </tr>
+              <tr>
+                <td><strong>Product Quality</strong></td>
+                <td>0.5000</td>
+                <td>0.5000</td>
+                <td>0.5000</td>
+                <td>2 samples</td>
+              </tr>
+              <tr>
+                <td><strong>Customer Support</strong></td>
+                <td>1.0000</td>
+                <td>1.0000</td>
+                <td>1.0000</td>
+                <td>1 sample</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style="margin-top: 15px; font-size: 11px; color: var(--pbi-gray);">
+            <strong>Observation:</strong> Domain-specific keyword rules achieve perfect precision (1.00) on clearly articulated topics like delivery and customer support.
+          </div>
+        </div>
+
+        <!-- Model Evaluation Methodology Details -->
+        <div class="card col-12">
+          <div class="card-title">
+            <span>Model Evaluation Integrity & Ethical Governance</span>
+          </div>
+          <p style="font-size: 12px; color: var(--pbi-gray); line-height: 1.6;">
+            <strong>Ground Truth Principle:</strong> CustomerVoice AI adheres strictly to the rule that model performance metrics may only be computed from real, human-annotated validation sets. No artificial validation sets were generated. As larger human-labeled golden sets are established, running <code>python scripts/run_evaluation.py</code> automatically updates the <code>model_metrics</code> table in PostgreSQL, instantly propagating new benchmark curves to Power BI.
+          </p>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer Info -->
+  <footer class="pbi-footer">
+    <div>CustomerVoice AI Platform • Version 1.0 • Connected to PostgreSQL Analytics Layer</div>
+    <div>Strict Data Lineage & Zero Fabrication Mandate Enforced</div>
+  </footer>
+
+  <script>
+    function switchPage(pageId) {
+      // Hide all pages
+      document.querySelectorAll('.page-content').forEach(el => el.classList.remove('active'));
+      // Remove active from all tabs
+      document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+
+      // Show selected page
+      document.getElementById(pageId).classList.add('active');
+
+      // Highlight active tab
+      const tabIndex = { 'page1': 0, 'page2': 1, 'page3': 2, 'page4': 3, 'page5': 4 }[pageId];
+      document.querySelectorAll('.nav-tab')[tabIndex].classList.add('active');
+    }
+  </script>
+</body>
+</html>

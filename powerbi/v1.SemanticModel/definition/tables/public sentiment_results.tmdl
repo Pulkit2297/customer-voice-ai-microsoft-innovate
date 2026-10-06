@@ -1,0 +1,89 @@
+table 'public sentiment_results'
+	lineageTag: d88ebc56-b93d-48a4-960a-4db168440684
+
+	column id
+		dataType: int64
+		formatString: 0
+		lineageTag: 38c79b3d-ad79-4d27-bc55-6cbd1325cc04
+		summarizeBy: sum
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_id
+		dataType: string
+		lineageTag: 54d66ea6-29e2-4d7a-a150-46466fd25554
+		summarizeBy: none
+		sourceColumn: review_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sentiment
+		dataType: string
+		lineageTag: 1a534520-63d9-498d-ab1c-b311e6320ddc
+		summarizeBy: none
+		sourceColumn: sentiment
+
+		annotation SummarizationSetBy = Automatic
+
+	column sentiment_score
+		dataType: double
+		lineageTag: ce36c24c-46d8-4af7-948d-de88d4e5d582
+		summarizeBy: sum
+		sourceColumn: sentiment_score
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column confidence
+		dataType: double
+		lineageTag: 5ca2a190-340e-4c98-80a3-8bb241e6e1c4
+		summarizeBy: sum
+		sourceColumn: confidence
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column model_name
+		dataType: string
+		lineageTag: 12df5f14-db1b-41f6-ac3c-99d1812b3a72
+		summarizeBy: none
+		sourceColumn: model_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column model_version
+		dataType: string
+		lineageTag: b9a0d773-9a79-40f7-8a51-8bddbd6b3fd0
+		summarizeBy: none
+		sourceColumn: model_version
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: 7b4864ac-dc38-49d1-b63a-609ad04a588f
+		summarizeBy: none
+		sourceColumn: created_at
+
+		variation Variation
+			isDefault
+			relationship: 7b4350c8-1453-49f4-b427-3706bd1c1f53
+			defaultHierarchy: LocalDateTable_31d49bd3-2b2f-4b70-a77b-f59bd8aec409.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'public sentiment_results' = m
+		mode: import
+		source =
+				let
+				  Source = PostgreSQL.Database("db.ehmgeoakcckhagdjjmmr.supabase.co", "postgres"),
+				  #"Navigation 1" = Source{[Schema = "public", Item = "sentiment_results"]}[Data]
+				in
+				  #"Navigation 1"
+
+	annotation PBI_ResultType = Table
+

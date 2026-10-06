@@ -1,0 +1,116 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "p2_table_verbatims",
+  "position": {
+    "x": 920,
+    "y": 230,
+    "z": 6,
+    "height": 800,
+    "width": 960,
+    "tabOrder": 6
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public reviews"
+                    }
+                  },
+                  "Property": "review_id"
+                }
+              },
+              "queryRef": "public reviews.review_id",
+              "nativeQueryRef": "Review ID"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public reviews"
+                    }
+                  },
+                  "Property": "source"
+                }
+              },
+              "queryRef": "public reviews.source",
+              "nativeQueryRef": "Channel"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public topics"
+                    }
+                  },
+                  "Property": "topic"
+                }
+              },
+              "queryRef": "public topics.topic",
+              "nativeQueryRef": "Topic"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public sentiment_results"
+                    }
+                  },
+                  "Property": "sentiment_score"
+                }
+              },
+              "queryRef": "public sentiment_results.sentiment_score",
+              "nativeQueryRef": "Compound Score"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public reviews"
+                    }
+                  },
+                  "Property": "cleaned_text"
+                }
+              },
+              "queryRef": "public reviews.cleaned_text",
+              "nativeQueryRef": "Customer Verbatim Feedback"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Customer Complaints Verbatim Drilldown'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

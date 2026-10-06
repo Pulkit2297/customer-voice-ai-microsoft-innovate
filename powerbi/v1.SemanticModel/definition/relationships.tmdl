@@ -1,0 +1,56 @@
+relationship 83e8dc5e-68e6-44e9-b6b3-00ace7f1dfda
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'public alerts'.created_at
+	toColumn: LocalDateTable_b4378a6d-3dad-4b5a-b747-755569a7ea38.Date
+
+relationship 6cc1ad1b-dd53-482c-98bd-9b689c585df4
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'public model_metrics'.evaluation_timestamp
+	toColumn: LocalDateTable_1e1bdf3d-fc85-4e12-b05b-6de1f50430e7.Date
+
+relationship 91ef29ae-58a3-4141-b213-f68aa9770728
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'public products'.created_at
+	toColumn: LocalDateTable_57979bea-a60c-4c1a-b16f-0bfeae124a7d.Date
+
+relationship e1306bc3-c8d0-4dbe-aa59-10bab6cf2d9a
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'public reviews'.review_date
+	toColumn: LocalDateTable_fc4b27d6-bc60-44d0-ac6a-430cf32fcc41.Date
+
+relationship 99d92180-fe3e-48f2-aa42-b053ca5e449b
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'public reviews'.created_at
+	toColumn: LocalDateTable_fdf51d8e-41c2-4065-bd99-1e3f2e1e760e.Date
+
+relationship 7b4350c8-1453-49f4-b427-3706bd1c1f53
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'public sentiment_results'.created_at
+	toColumn: LocalDateTable_31d49bd3-2b2f-4b70-a77b-f59bd8aec409.Date
+
+relationship b8e79205-a6e9-4a16-8b87-8fb26184715c
+	joinOnDateBehavior: datePartOnly
+	fromColumn: 'public topics'.created_at
+	toColumn: LocalDateTable_9b2a6ed1-3209-44c5-9700-112901b4da98.Date
+
+relationship a84aec3a-9c46-4eaf-8edf-f8580f59ac97
+	fromColumn: 'public reviews'.product_id
+	toColumn: 'public products'.product_id
+
+	annotation PBI_IsFromSource = FS
+
+relationship ef98e08b-27bf-4508-b96d-b89b293ecf2a
+	crossFilteringBehavior: bothDirections
+	fromCardinality: one
+	fromColumn: 'public sentiment_results'.review_id
+	toColumn: 'public reviews'.review_id
+
+	annotation PBI_IsFromSource = FS
+
+relationship afcec680-b43f-475f-a888-0fa8b6ca32ad
+	crossFilteringBehavior: bothDirections
+	fromColumn: 'public topics'.review_id
+	toColumn: 'public reviews'.review_id
+
+	annotation PBI_IsFromSource = FS
+

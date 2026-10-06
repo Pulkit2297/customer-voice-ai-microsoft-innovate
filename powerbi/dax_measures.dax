@@ -1,0 +1,263 @@
+// ============================================================================
+// CustomerVoice AI - DAX Measures Library for Power BI Analytical Layer
+// ============================================================================
+// Organized by Dashboard Page:
+// - Page 1: Executive Overview
+// - Page 2: Why Are Customers Unhappy?
+// - Page 3: Product / Campaign Comparison
+// - Page 4: Trends & Alerts
+// - Page 5: Model Health
+// ============================================================================
+
+
+// ----------------------------------------------------------------------------
+// PAGE 1: EXECUTIVE OVERVIEW MEASURES
+// ----------------------------------------------------------------------------
+
+[Total Reviews] = 
+COUNTROWS(FactReviews)
+
+[Positive Reviews] = 
+CALCULATE(
+    COUNTROWS(FactReviews),
+    FactSentiment[sentiment] = "Positive"
+)
+
+[Negative Reviews] = 
+CALCULATE(
+    COUNTROWS(FactReviews),
+    FactSentiment[sentiment] = "Negative"
+)
+
+[Neutral Reviews] = 
+CALCULATE(
+    COUNTROWS(FactReviews),
+    FactSentiment[sentiment] = "Neutral"
+)
+
+[Positive Sentiment %] = 
+DIVIDE([Positive Reviews], [Total Reviews], 0)
+
+[Negative Sentiment %] = 
+DIVIDE([Negative Reviews], [Total Reviews], 0)
+
+[Neutral Sentiment %] = 
+DIVIDE([Neutral Reviews], [Total Reviews], 0)
+
+[Net Sentiment Score (NSS)] = 
+[Positive Sentiment %] - [Negative Sentiment %]
+
+[Average Sentiment Compound Score] = 
+AVERAGE(FactSentiment[sentiment_score])
+
+[Average Confidence Score] = 
+AVERAGE(FactSentiment[confidence])
+
+[PII Redacted Reviews Count] = 
+CALCULATE(
+    COUNTROWS(FactReviews),
+    FactReviews[pii_detected] = TRUE()
+)
+
+[PII Redaction Rate %] = 
+DIVIDE([PII Redacted Reviews Count], [Total Reviews], 0)
+
+
+
+// ----------------------------------------------------------------------------
+// PAGE 2: WHY ARE CUSTOMERS UNHAPPY? MEASURES
+// ----------------------------------------------------------------------------
+
+[Total Complaint Mentions] = 
+CALCULATE(
+    COUNTROWS(BridgeTopics),
+    FactSentiment[sentiment] = "Negative"
+)
+
+[Negative Review Count by Topic] = 
+CALCULATE(
+    DISTINCTCOUNT(FactReviews[review_id]),
+    FactSentiment[sentiment] = "Negative"
+)
+
+[Topic Negative Sentiment Rate %] = 
+DIVIDE(
+    CALCULATE(DISTINCTCOUNT(FactReviews[review_id]), FactSentiment[sentiment] = "Negative"),
+    DISTINCTCOUNT(FactReviews[review_id]),
+    0
+)
+
+[Severe Complaint Concentration Flag] = 
+IF(
+    [Topic Negative Sentiment Rate %] >= 0.35,
+    "CRITICAL CONCENTRATION (>35%)",
+    "MODERATE"
+)
+
+[Average Negative Sentiment Intensity] = 
+CALCULATE(
+    AVERAGE(FactSentiment[sentiment_score]),
+    FactSentiment[sentiment] = "Negative"
+)
+
+[Primary Topic Reviews] = 
+CALCULATE(
+    COUNTROWS(BridgeTopics),
+    BridgeTopics[is_primary] = TRUE()
+)
+
+
+
+// ----------------------------------------------------------------------------
+// PAGE 3: PRODUCT / CAMPAIGN COMPARISON MEASURES
+// ----------------------------------------------------------------------------
+
+[Amazon Corpus Reviews] = 
+CALCULATE(
+    COUNTROWS(FactReviews),
+    FactReviews[source] = "Amazon"
+)
+
+[Social Twitter Corpus Reviews] = 
+CALCULATE(
+    COUNTROWS(FactReviews),
+    FactReviews[source] = "Twitter/Social"
+)
+
+[Amazon Negative %] = 
+DIVIDE(
+    CALCULATE(COUNTROWS(FactReviews), FactReviews[source] = "Amazon", FactSentiment[sentiment] = "Negative"),
+    [Amazon Corpus Reviews],
+    0
+)
+
+[Twitter Negative %] = 
+DIVIDE(
+    CALCULATE(COUNTROWS(FactReviews), FactReviews[source] = "Twitter/Social", FactSentiment[sentiment] = "Negative"),
+    [Social Twitter Corpus Reviews],
+    0
+)
+
+[Genuine Product SKU Count] = 
+DISTINCTCOUNTNOBLANK(FactReviews[product_id])
+
+[Genuine Campaign Count] = 
+DISTINCTCOUNTNOBLANK(FactReviews[campaign])
+
+[Data Integrity Note: Products & Campaigns] = 
+"AUTHENTIC DATA POLICY: 0 genuine product SKUs or marketing campaigns exist in the raw corpora. Columns preserved as NULL to prevent data fabrication. Channel-level and topical segment comparisons displayed."
+
+
+
+// ----------------------------------------------------------------------------
+// PAGE 4: TRENDS & ALERTS MEASURES
+// ----------------------------------------------------------------------------
+
+[Active Alerts Count] = 
+CALCULATE(
+    COUNTROWS(FactAlerts),
+    FactAlerts[status] = "ACTIVE"
+)
+
+[High Severity Alerts Count] = 
+CALCULATE(
+    COUNTROWS(FactAlerts),
+    FactAlerts[severity] = "HIGH"
+)
+
+[Medium Severity Alerts Count] = 
+CALCULATE(
+    COUNTROWS(FactAlerts),
+    FactAlerts[severity] = "MEDIUM"
+)
+
+[Temporal Trend Engine Status] = 
+IF(
+    ISBLANK(MAX(FactReviews[review_date])),
+    "STATUS: INSUFFICIENT_TEMPORAL_DATA (Synthetic dates eliminated)",
+    "STATUS: ACTIVE TIME SERIES"
+)
+
+[Alert Config: Negative Surge Cutoff] = 
+"Delta >= 20.0% / Relative >= 20.0%"
+
+[Alert Config: Topic Volume Surge Cutoff] = 
+"Increase >= 30.0% (Min Vol: 3)"
+
+[Alert Config: Rating Drop Cutoff] = 
+"Drop >= 0.50 Stars"
+
+[Alert Config: Model F1 Decay Cutoff] = 
+"F1 Decrease >= 0.10"
+
+
+
+// ----------------------------------------------------------------------------
+// PAGE 5: MODEL HEALTH & BENCHMARK MEASURES
+// ----------------------------------------------------------------------------
+
+[Sentiment Model Accuracy] = 
+CALCULATE(
+    MAX(FactModelMetrics[metric_value]),
+    FactModelMetrics[evaluation_type] = "sentiment",
+    FactModelMetrics[metric_name] = "accuracy"
+)
+
+[Sentiment Model Macro F1] = 
+CALCULATE(
+    MAX(FactModelMetrics[metric_value]),
+    FactModelMetrics[evaluation_type] = "sentiment",
+    FactModelMetrics[metric_name] = "macro_f1"
+)
+
+[Sentiment Model Weighted F1] = 
+CALCULATE(
+    MAX(FactModelMetrics[metric_value]),
+    FactModelMetrics[evaluation_type] = "sentiment",
+    FactModelMetrics[metric_name] = "weighted_f1"
+)
+
+[Sentiment Model Macro Precision] = 
+CALCULATE(
+    MAX(FactModelMetrics[metric_value]),
+    FactModelMetrics[evaluation_type] = "sentiment",
+    FactModelMetrics[metric_name] = "macro_precision"
+)
+
+[Sentiment Model Macro Recall] = 
+CALCULATE(
+    MAX(FactModelMetrics[metric_value]),
+    FactModelMetrics[evaluation_type] = "sentiment",
+    FactModelMetrics[metric_name] = "macro_recall"
+)
+
+[Validation Ground Truth Sample Size] = 
+CALCULATE(
+    MAX(FactModelMetrics[validation_sample_size]),
+    FactModelMetrics[evaluation_type] = "sentiment",
+    FactModelMetrics[metric_name] = "accuracy"
+)
+
+[Positive Class F1-Score] = 
+CALCULATE(
+    MAX(FactModelMetrics[metric_value]),
+    FactModelMetrics[category] = "positive",
+    FactModelMetrics[metric_name] = "f1_score"
+)
+
+[Negative Class F1-Score] = 
+CALCULATE(
+    MAX(FactModelMetrics[metric_value]),
+    FactModelMetrics[category] = "negative",
+    FactModelMetrics[metric_name] = "f1_score"
+)
+
+[Neutral Class F1-Score] = 
+CALCULATE(
+    MAX(FactModelMetrics[metric_value]),
+    FactModelMetrics[category] = "neutral",
+    FactModelMetrics[metric_name] = "f1_score"
+)
+
+[Model Governance Disclaimer] = 
+"VALIDATION POLICY: Metrics computed strictly against data/validation/validation_set.csv ground truth. Model performance is never claimed without empirical validation calculation."

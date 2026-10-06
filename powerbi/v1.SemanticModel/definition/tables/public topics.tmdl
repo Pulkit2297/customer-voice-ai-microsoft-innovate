@@ -1,0 +1,72 @@
+table 'public topics'
+	lineageTag: 7aefb67c-81b9-4a44-9a6c-215b1feab598
+
+	column id
+		dataType: int64
+		formatString: 0
+		lineageTag: f4c3d25e-81cf-4b8e-b53b-438cd01b6f94
+		summarizeBy: sum
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	column review_id
+		dataType: string
+		lineageTag: f87b260b-cea3-479d-93fa-e8fd5cb3a889
+		summarizeBy: none
+		sourceColumn: review_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column topic
+		dataType: string
+		lineageTag: 67c75bd9-01f6-4082-abee-777e355f76f4
+		summarizeBy: none
+		sourceColumn: topic
+
+		annotation SummarizationSetBy = Automatic
+
+	column topic_confidence
+		dataType: double
+		lineageTag: fad1a433-ecba-4e4e-9ee2-df330dbd3051
+		summarizeBy: sum
+		sourceColumn: topic_confidence
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column is_primary
+		dataType: boolean
+		formatString: """TRUE"";""TRUE"";""FALSE"""
+		lineageTag: 1e5670a1-a843-4f80-8aa1-ec47f380c9aa
+		summarizeBy: none
+		sourceColumn: is_primary
+
+		annotation SummarizationSetBy = Automatic
+
+	column created_at
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: e87f6a19-1c76-49ea-8260-4383e6fe3a9b
+		summarizeBy: none
+		sourceColumn: created_at
+
+		variation Variation
+			isDefault
+			relationship: b8e79205-a6e9-4a16-8b87-8fb26184715c
+			defaultHierarchy: LocalDateTable_9b2a6ed1-3209-44c5-9700-112901b4da98.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'public topics' = m
+		mode: import
+		source =
+				let
+				  Source = PostgreSQL.Database("db.ehmgeoakcckhagdjjmmr.supabase.co", "postgres"),
+				  #"Navigation 1" = Source{[Schema = "public", Item = "topics"]}[Data]
+				in
+				  #"Navigation 1"
+
+	annotation PBI_ResultType = Table
+

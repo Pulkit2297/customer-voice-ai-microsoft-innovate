@@ -1,0 +1,80 @@
+table 'public model_metrics'
+	lineageTag: 8733745e-0a09-4a13-b1d1-effaa5da828b
+
+	column id
+		dataType: int64
+		formatString: 0
+		lineageTag: a402bef5-87a0-4f70-b3e6-bdc6ac0aa18a
+		summarizeBy: sum
+		sourceColumn: id
+
+		annotation SummarizationSetBy = Automatic
+
+	column evaluation_type
+		dataType: string
+		lineageTag: f7d4d0c6-c43a-4d85-9af0-6c7e5fb6425a
+		summarizeBy: none
+		sourceColumn: evaluation_type
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		lineageTag: 1a41549d-7de1-40aa-8406-0d096f84b4e1
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column metric_name
+		dataType: string
+		lineageTag: bbd6620a-6e93-405e-bda1-9da1c9ae1c4e
+		summarizeBy: none
+		sourceColumn: metric_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column metric_value
+		dataType: double
+		lineageTag: fc9ee00f-c468-4058-9b05-b62042f28d98
+		summarizeBy: sum
+		sourceColumn: metric_value
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column validation_sample_size
+		dataType: int64
+		formatString: 0
+		lineageTag: d533a610-2264-47bd-a93c-ed7a051dc9f4
+		summarizeBy: sum
+		sourceColumn: validation_sample_size
+
+		annotation SummarizationSetBy = Automatic
+
+	column evaluation_timestamp
+		dataType: dateTime
+		formatString: General Date
+		lineageTag: bc5dd3ea-f118-4d42-829d-5ba99db92e14
+		summarizeBy: none
+		sourceColumn: evaluation_timestamp
+
+		variation Variation
+			isDefault
+			relationship: 6cc1ad1b-dd53-482c-98bd-9b689c585df4
+			defaultHierarchy: LocalDateTable_1e1bdf3d-fc85-4e12-b05b-6de1f50430e7.'Date Hierarchy'
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'public model_metrics' = m
+		mode: import
+		source =
+				let
+				  Source = PostgreSQL.Database("db.ehmgeoakcckhagdjjmmr.supabase.co", "postgres"),
+				  #"Navigation 1" = Source{[Schema = "public", Item = "model_metrics"]}[Data]
+				in
+				  #"Navigation 1"
+
+	annotation PBI_ResultType = Table
+

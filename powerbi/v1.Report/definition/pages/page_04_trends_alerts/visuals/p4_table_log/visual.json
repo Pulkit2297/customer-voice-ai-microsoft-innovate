@@ -1,0 +1,144 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.12.0/schema.json",
+  "name": "p4_table_log",
+  "position": {
+    "x": 820,
+    "y": 360,
+    "z": 7,
+    "height": 670,
+    "width": 1060,
+    "tabOrder": 7
+  },
+  "visual": {
+    "visualType": "tableEx",
+    "query": {
+      "queryState": {
+        "Values": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public alerts"
+                    }
+                  },
+                  "Property": "alert_id"
+                }
+              },
+              "queryRef": "public alerts.alert_id",
+              "nativeQueryRef": "Alert ID"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public alerts"
+                    }
+                  },
+                  "Property": "alert_type"
+                }
+              },
+              "queryRef": "public alerts.alert_type",
+              "nativeQueryRef": "Type"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public alerts"
+                    }
+                  },
+                  "Property": "severity"
+                }
+              },
+              "queryRef": "public alerts.severity",
+              "nativeQueryRef": "Severity"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public alerts"
+                    }
+                  },
+                  "Property": "topic"
+                }
+              },
+              "queryRef": "public alerts.topic",
+              "nativeQueryRef": "Topic"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public alerts"
+                    }
+                  },
+                  "Property": "percentage_change"
+                }
+              },
+              "queryRef": "public alerts.percentage_change",
+              "nativeQueryRef": "% Change"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public alerts"
+                    }
+                  },
+                  "Property": "message"
+                }
+              },
+              "queryRef": "public alerts.message",
+              "nativeQueryRef": "Diagnostic Message"
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "public alerts"
+                    }
+                  },
+                  "Property": "status"
+                }
+              },
+              "queryRef": "public alerts.status",
+              "nativeQueryRef": "Status"
+            }
+          ]
+        }
+      }
+    },
+    "visualContainerObjects": {
+      "title": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Operational Alert Registry (0 False Alarms)'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
