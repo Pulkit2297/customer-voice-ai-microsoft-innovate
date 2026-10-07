@@ -54,3 +54,6 @@ Thumbs.db
 # Local backups & local cluster data
 powerbi_backup/
 data/postgres_data/
+
+
+*.json.gz
